@@ -1,0 +1,47 @@
+@startuml
+skinparam ParticipantFontSize 14
+skinparam ParticipantFontColor #White
+header "Event First Pub/Sub"
+title Event First Pub-Sub Conceptual Sequence on Azure
+participant ClientApp as "<b>Client App\n" #SlateGray
+participant OrderService as "<b>Order\n<b>Service" #RoyalBlue
+participant EntityStore as "<b>Cosmos DB\n<b>Entity Store" #DarkCyan
+participant Publisher as "<b>Azure Function\n" #DarkSlateBlue
+participant EventHubs as "<b>Event Hubs\n" #Darkorange
+
+autonumber
+activate ClientApp #Lime
+ClientApp -> OrderService : Submit <b>create_order</b> command
+
+activate OrderService #Lime
+OrderService -> EntityStore : Append <b>order_created</b> event
+
+activate EntityStore #Lime
+EntityStore --> OrderService : Return success
+
+deactivate EntityStore
+OrderService --> ClientApp : Return success
+
+deactivate OrderService
+deactivate ClientApp
+
+
+' #######################################################################
+' hack so that the life bar on the entity store shows a seperation
+OrderService-[hidden]->OrderService
+' #######################################################################
+
+EntityStore <- Publisher : Read Change Feed\n(<i>Change Data Capture</i>)
+activate EntityStore #Lime
+
+activate Publisher #Lime
+Publisher -> EventHubs : Publish <b>order_created</b> event
+
+activate EventHubs #Lime
+EventHubs --> Publisher : Return success
+deactivate EventHubs
+
+Publisher -> EntityStore : Update change feed\ncheck-point on lease container
+deactivate Publisher
+deactivate EntityStore
+@enduml
