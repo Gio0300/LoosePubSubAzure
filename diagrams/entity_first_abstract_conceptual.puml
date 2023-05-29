@@ -1,0 +1,16 @@
+@startuml
+header "Entity First Pub/Sub"
+title Entity First Pub/Sub - Abstract Conceptual Sequence 
+participant BizzLogic as "Business Logic"
+database EntStore as "Entity Store"
+participant Publisher as "Publisher"
+queue MsgBroker as "Message Broker"
+
+autonumber
+BizzLogic -> EntStore : Entity CRUD
+EntStore --> BizzLogic : CRUD Ack
+EntStore <- Publisher : Change Data Capture (CDC)
+Publisher -> Publisher : Translate CDC to Event
+Publisher -> MsgBroker : Publish Event
+Publisher -> Publisher : CDC check-point
+@enduml
