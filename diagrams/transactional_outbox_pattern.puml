@@ -1,11 +1,11 @@
 @startuml
 skinparam ParticipantFontSize 14
 skinparam ParticipantFontColor #White
-header "Event First Pub/Sub"
-title Event First Pub-Sub Conceptual Sequence on Azure
+header "Transactional Outbox Pub/Sub"
+title Transactional Outbox Pub-Sub Conceptual Sequence on Azure
 participant ClientApp as "<b>Client App\n" #SlateGray
 participant OrderService as "<b>Order\n<b>Service" #RoyalBlue
-participant EventStore as "<b>Event Store\n<i><<Cosmos DB>>" #DarkCyan
+participant DataStore as "<b>Data Store\n<i><<Cosmos DB>>" #DarkCyan
 participant Publisher as "<b>Background Worker\n<i><<Azure Function>>" #DarkSlateBlue
 participant EventHubs as "<b>Message Broker\n<i><<Event Hubs>>" #Darkorange
 
@@ -14,12 +14,13 @@ activate ClientApp #Lime
 ClientApp -> OrderService : Submit <b>create_order</b> command
 
 activate OrderService #Lime
-OrderService -> EventStore : Append <b>order_created</b> event
+OrderService -> DataStore : Begin Transaction
+activate DataStore #Lime
+OrderService -> DataStore : Insert <b>Order</b> document
+OrderService -> DataStore : Append <b>order_created</b> event
+OrderService -> DataStore : Commit Transaction
 
-activate EventStore #Lime
-EventStore --> OrderService : Return success
-
-deactivate EventStore
+deactivate DataStore
 OrderService --> ClientApp : Return success
 
 deactivate OrderService
@@ -31,8 +32,8 @@ deactivate ClientApp
 'OrderService-[hidden]->OrderService
 ' #######################################################################
 
-EventStore <- Publisher : Read Change Feed\n(<i>Change Data Capture</i>)
-activate EventStore #Lime
+DataStore <- Publisher : Read Change Feed\n(<i>Change Data Capture</i>)
+activate DataStore #Lime
 
 activate Publisher #Lime
 Publisher -> EventHubs : Publish <b>order_created</b> event
@@ -41,7 +42,7 @@ activate EventHubs #Lime
 EventHubs --> Publisher : Return success
 deactivate EventHubs
 
-Publisher -> EventStore : Update change feed\ncheck-point on lease container
+Publisher -> DataStore : Update change feed\ncheck-point on lease container
 deactivate Publisher
-deactivate EventStore
+deactivate DataStore
 @enduml

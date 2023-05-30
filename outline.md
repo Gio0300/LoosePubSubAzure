@@ -1,19 +1,22 @@
 Intro
+
 	Define Producer, publisher, subscriber, consumer
 		Publisher sets the terms of the integration. It owns the message broker and the data retention policy.
 		Subscriber is owned by the consumer. Each consumer is responsible for its own inbox (if needed).
 	Why make a distinction between producer and publisher and subscriber and consumer.
-		Publishing events and subscribing to events is an infrastructure concern, the business logic shouldn't care how the events are published or obtained. To realize that separation of concern we separate components that may be changed and scaled independently.
+		Publishing events and subscribing to events is an infrastructure concern, the business logic shouldn't care how the events are published or obtained. To realize that separation of concern we build distinct components that may be changed and scaled independently.
 		Eliminates the need for a distributed transaction (one transaction to the event store and one transaction to the message broker).
-		When working with legacy systems we need
+		When working with legacy systems that need to be included in an event driven architecture we need to create an adapter in the form of an event publisher which is quite distinct from the producer.
+		To help with HA and DR.
 	No claims of resiliency and high availability
 		That will be a different article discussing how to implement multi-region active-active pub-sub.
 	Inbox/Outbox - provide link to article.
 
 	
 Components
+
 	Producer: Web API 
-	
+
 	Entity Store: Cosmos
 	
 	Event Store Cosmos (Transactional Outbox pattern).
@@ -46,10 +49,10 @@ Components
 					Poison pill
 				-- No built-in geo-replication (yet)
 			Warn about using a database (cosmos or SQL) 
-				Cosmos DB - Consumer subscribes to change feed - reliable and guaranteed at least once, easy to implement geo-replication but no built-in message broker features.
+				Cosmos DB - Consumer subscribes to change feed - reliable and guaranteed at least once, easy to implement geo-replication but no built-in message broker features and semantics.
 					DLQ
-					Metrics
-					Events
+					Metrics (number of messages in queue, throughput)
+					Message Bus Events (new event in queue without listener)
 					Insights
 					Session State
 					Distributed tracing context
