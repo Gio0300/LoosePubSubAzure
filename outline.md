@@ -21,11 +21,11 @@ Components
 	
 	Event Store Cosmos (Transactional Outbox pattern).
 		Describe three patterns
-			Unit of work (Entity + Event) with Transactional Outbox
 			Entity First with change feed event producer. 
 				Adapting a legacy system into an EDA.
 			Event First with change feed read model maintainer
 				Pure event driven architecture with specialized read models
+			Unit of work (Entity + Event) with Transactional Outbox
 			Draw a sequence diagram for each.
 		For this article we'll use Transactional Outbox
 			

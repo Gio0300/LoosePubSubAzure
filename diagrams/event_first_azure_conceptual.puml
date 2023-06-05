@@ -25,12 +25,6 @@ OrderService --> ClientApp : Return success
 deactivate OrderService
 deactivate ClientApp
 
-
-' #######################################################################
-' hack so that the life bar on the entity store shows a seperation
-'OrderService-[hidden]->OrderService
-' #######################################################################
-
 EventStore <- Publisher : Read Change Feed\n(<i>Change Data Capture</i>)
 activate EventStore #Lime
 
