@@ -6,7 +6,7 @@ title Event First Pub-Sub Conceptual Sequence on Azure
 participant ClientApp as "<b>Client App\n" #SlateGray
 participant OrderService as "<b>Order\n<b>Service" #RoyalBlue
 participant EventStore as "<b>Event Store\n<i><<Cosmos DB>>" #DarkCyan
-participant Publisher as "<b>Background Worker\n<i><<Azure Function>>" #DarkSlateBlue
+participant Publisher as "<b>Publisher\n<i><<Azure Function>>" #DarkSlateBlue
 participant EventHubs as "<b>Message Broker\n<i><<Event Hubs>>" #Darkorange
 
 autonumber

@@ -5,8 +5,8 @@ header "Entity First Pub/Sub"
 title Entity First Pub-Sub Conceptual Sequence on Azure
 participant ClientApp as "<b>Client App\n" #SlateGray
 participant OrderService as "<b>Legacy Order\n<b>Service" #RoyalBlue
-participant EntityStore as "<b>Data Store\n<i><<Relational DB>>" #DarkCyan
-participant Publisher as "<b>Background Worker\n<i><<Azure Function>>" #DarkSlateBlue
+participant DataStore as "<b>Data Store\n<i><<Relational DB>>" #DarkCyan
+participant Publisher as "<b>Publisher\n<i><<WebJob>>" #DarkSlateBlue
 participant EventHubs as "<b>Message Broker\n<i><<Event Hubs>>" #Darkorange
 
 autonumber
@@ -14,17 +14,18 @@ activate ClientApp #Lime
 ClientApp -> OrderService : Create Order
 activate OrderService #Lime
 
-OrderService -> EntityStore : 'INSERT INTO Orders'
-activate EntityStore #Lime
-EntityStore --> OrderService : Return OrderId
+OrderService -> DataStore : 'INSERT INTO Orders'
+note right of DataStore: this pattern could just as easliy be\napplied on a NoSQL database
+activate DataStore #Lime
+DataStore --> OrderService : Return OrderId
 
-deactivate EntityStore
+deactivate DataStore
 OrderService --> ClientApp : Return OrderId
 deactivate OrderService
 deactivate ClientApp
 
-EntityStore <- Publisher : Read database log\n(<i>Change Data Capture</i>)
-activate EntityStore #Lime
+DataStore <- Publisher : Read database log\n(<i>Change Data Capture</i>)
+activate DataStore #Lime
 activate Publisher #Lime
 Publisher -> Publisher : Derive orderCreated event\nbased on order table insert
 
@@ -32,7 +33,7 @@ Publisher -> EventHubs : Publish orderCreated event
 activate EventHubs #Lime
 EventHubs --> Publisher : Return success
 deactivate EventHubs
-Publisher -> EntityStore : CDC check-point
+Publisher -> DataStore : CDC check-point
 deactivate Publisher
-deactivate EntityStore
+deactivate DataStore
 @enduml
