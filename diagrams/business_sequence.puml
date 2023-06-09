@@ -3,28 +3,28 @@ skinparam ParticipantFontSize 14
 skinparam ParticipantFontColor #White
 title Order Created Event - Functional Sequence Diagram
 participant ClientApp as "<b>Client App" #SlateGray
-participant OrderService as "<b>Orders\n<i><<Producer>>" #RoyalBlue
-participant EventStore as "<b>Event Store" #DarkCyan
+participant Producer as "<b>Producer\n<i><<Order Service>>" #RoyalBlue
+participant EventStore as "<b>Event Store\n<i><<Produer Outbox>>" #DarkCyan
 participant Publisher as "<b>Publisher" #DarkSlateBlue
 participant MessageBus as "<b>Message Bus" #Darkorange
 participant Subscriber as "<b>Subscriber" #DarkSlateBlue
-participant BillingInbox as "<b>Billing Inbox" #DarkCyan
-participant BillingService as "<b>Billing\n<i><<Consumer>>" #RoyalBlue
+participant BillingInbox as "<b>Consumer Inbox\n<i><<Billing Inbox>>" #DarkCyan
+participant BillingService as "<b>Consumer\n<i><<Billing Service>>" #RoyalBlue
 
 autonumber
 activate ClientApp #Lime
-ClientApp -> OrderService : Submit <b>create_order</b> command
+ClientApp -> Producer : Submit <b>create_order</b> command
 
-activate OrderService #Lime
-OrderService -> EventStore : Append <b>order_created</b> event
+activate Producer #Lime
+Producer -> EventStore : Append <b>order_created</b> event
 
 activate EventStore #Lime
-EventStore --> OrderService : Return success
+EventStore --> Producer : Return success
 
 deactivate EventStore
-OrderService --> ClientApp : Return success
+Producer --> ClientApp : Return success
 
-deactivate OrderService
+deactivate Producer
 deactivate ClientApp
 
 EventStore <- Publisher : Read database log\n(<i>Change Data Capture</i>)

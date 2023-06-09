@@ -62,7 +62,7 @@ With Cosmos DB as our event store the most convenient way to implement a publish
 Azure Functions is just one many compute platforms available. The publisher may be implemented with just about any compute solution thanks to the many change feed processors SDKs available on the market. 
 
 ## Alternatives publishing patterns
-There are two other loosely coupled publishing patterns I want to touch on, entity-first and [transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html). Entity-first is focused on integrating non-event-driven applications into an event driven architecture. Transactional outbox is somewhat of a hybrid implementation of entity-first and event-driven apps.
+There are two other loosely coupled publishing patterns I want to touch on before we move on to the subscription side of the pub-sub equation, entity-first and [transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html). Entity-first is focused on integrating non-event-driven applications into an event-driven architecture. Transactional outbox is somewhat of a hybrid implementation of entity-first and event-driven apps.
 
 ### Entity-first event publishing
 It is common to find business critical application that operate directly on the state of a business entity. In other words, these are not event-driven applications. These application have no concept of a domain event, only the latest entity state is ever persisted. It is not uncommon to have to integrate these applications into an event driven architecture. In fact I suspect the need to integrate these system is commonplace in any organization that has been around for more than a few years. Modifying these applications to publish events is typically not practical. An common approach is to implement an adapter component that reads the database log and publishes events to a message bus. The following rudimentary sequence diagram illustrates the broad strokes.
@@ -76,8 +76,32 @@ In the most academic sense the producer in an event-driven application does not 
 
 The transactional outbox pattern is not without trade offs. Applying [this pattern with Cosmos DB](https://learn.microsoft.com/en-us/azure/architecture/best-practices/transactional-outbox-cosmos) has its own challenges. The entity state and the events must reside in the same container. This means that entity state and events share a few physical resources (storage, RU's, backups, partition keys) and operational concerns (read/write permissions, maintenance windows, monitoring).
 
-### Message Bus - <i><<Service Bus\>\></i>
+### Message Bus - <i><<Service Bus or Event Hubs\>\></i>
+There are a million descriptions of the message bus concept in the architectural literature and just as many products and managed services in the market to fit all needs and so we will not labor the matter. For a comparison of the services offered on Azure see: [Choose between Azure messaging services - Event Grid, Event Hubs, and Service Bus](https://learn.microsoft.com/en-us/azure/service-bus-messaging/compare-messaging-services).
 
+### Subscriber - <i><<Azure Functions\>\></i>
+Azure Functions offers input bindings for [Event Hubs](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-hubs-trigger?tabs=python-v2%2Cin-process%2Cfunctionsv2%2Cextensionv5&pivots=programming-language-csharp) and [Service Bus](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus-trigger?tabs=python-v2%2Cin-process%2Cextensionv5&pivots=programming-language-csharp). These triggers make it easy to implement a subscriber. The triggers require little to no custom code and they abstract away the intricacies of the Event Hub and Service Bus. The functions run-time along with the input trigger scale functions to match message bus solutions. The triggers maintain check-pointing as necessary. With the right output binding we can keep the infrastructure plumbing code to a bare minimum.
+
+### Inbox
+Which data storage service we choose for the inbox is going to depend on the characteristics of the consumer. How sensitive is the consumer to latency? Is the consumer scalable? Does the consumer support idempotency? The list of factors to consider can be extensive but typically one or two factors drive the decision. 
+
+Assuming the consumer is an event-driven application we may choose to employ another instance of a message bus. A different type consumer could be the leader board for a multi-player game; we may forgo the inbox altogether in that case. Imagine the consumer is a legacy application that operates from CSV batch files, here the inbox may simply be a file on Azure Blob Storage. Ultimately the choice of subscriber and inbox must be made in terms of the consumer.
+
+    It maybe be tempting to use Cosmos DB as an inbox for an event-driven consumer. After all the change feed provides an in-order, durable, lifetime stream of the events. Pair that with the change feed processor on the consumer and you have a rudimentary log-based message bus (ie: Event Hubs, Kafka). It is tempting but I would advice against it. Using Cosmos DB or any other database as an inbox means you loose out on the messaging semantics of a purpose built message bus. 
+
+    For example databases typically lack support for the following messaging constructs.
+    * Competing consumer processing - eg: server managed locks
+    * Fan out distribution
+    * Built-in dead letter queue
+    * Maximum delivery count
+    * Session state
+    * Check-pointing
+    * Native messaging observability metrics - eg: number of messages in queue, messages per second
+    * Native messaging insights - eg: Application Insights, Azure Advisor, Azure Policy will not interpret the database as a message bus.
+    * Native platform events and integration - eg: native integration with Event Grid, Azure Functions, and SDKs.
+  
+
+    
 
 ## Principals of loosely coupled pub-sub architectures
 If you take away anything from this article let it be these principals.
