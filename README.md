@@ -1,8 +1,17 @@
 # Loosely coupled pub-sub on Azure
 
+The [publisher-subscriber pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) is all about decoupling systems. In this article we are going to explore how to implement a loosely coupled pub-sub architecture in Azure. Before we get into the technical stuff we need to visit the real-world distribution model that is the inspiration for this pattern. We will start by looking at an over-simplified example of how the pub-sub pattern works in the music industry. Then I will translate the real-world example into technical jargon. Next, I will put forward several arguments in favor of implementing the pub-sub pattern as loosely coupled components. Finally we'll close out by contemplating a possible implementation using Azure services.
 
+## Physical media distribution
+TODO: left off here, need to write an introduction to the bullet list below. Then a translation to EDA terminology.
 
+* A musician produces a musical album in a recording studio.
+* A record label manufactures and publishes the album.
+* A distributor ships the album through it's distribution channels to retailers.
+* Retailers have direct relationships with distributor to obtain the album.
+* Consumers purchase the album from retailers.
 
+The pattern works in the real world because regular folks like you and do not need to know how the album got the store. Our area of concern is simple. We care that our favorite artist recorded a fantastic album, in other words, we care about the art, and we care that it is conveniently available for purchase. 
 
 
 Let's start with some definitions to make sure we have a shared understanding of the terms. In particular I am going to make a firm distinction between the terms producer and publisher as well as subscribers and consumers. These terms are often used interchangeably in high level system designs. But once we get into implementation details the distinction becomes necessary.
@@ -20,9 +29,9 @@ The pub-sub pattern in software development is directly based on the real world 
 #### Separation of concern
 Publishing events is a complex endeavour. Publishers must deal with the idiosyncrasies of the message bus solution, integration policies, geo-replication, retries, replays, queue & log semantics, partitions, sessions, ordering, deduplication, idempotency. Producers should not be burdened with such technical details.
 #### Reduce distributed transactions
-Separating the roles eliminates the need for a distributed transaction between the event store and the message bus. The producer, a component within the business layer, need only to emit the domain event, the application and infrastructure layers will marshal the event to the event store in a single transaction.
+Separating the roles eliminates the need for a distributed transaction between the producer, the event store, and the message bus. The producer need only to emit the domain event, the application and infrastructure layers will marshal the event to the event store in a single transaction.
 
-The publisher will eventually publish the event in a separate transaction. With this arrangement the producer is free to operate even when there is an outage on the publishing side.
+The publisher will eventually read the event and subsequently publish the event in a separate transaction. With this arrangement the producer is free to operate even when there is an outage on the message bus.
 
 #### Independent scaling
 The scaling profile of the producer may be widely different than that of the publisher. Consider an application where the producer is a real-time service that accepts customer orders. The producer will need to be scaled in direct relation to customer demand, maybe this demand is seasonal, maybe it's unpredictable. Once an order is placed successfully the rest of the order workflow may operate at a fixed rate. In this example the publisher may be scaled to provide a fixed throughput in order to provide load leveling for the rest of the systems. Now consider a scenario were a large number of events need to be republished. Perhaps the business wants to try new analytics workflow or to hydrate the message bus after recovering from a disaster. In such cases the publisher may be scaled out temporarily to provide increased throughput without affecting the producer.
