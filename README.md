@@ -1,17 +1,30 @@
 # Loosely coupled pub-sub on Azure
 
-The [publisher-subscriber pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) is all about decoupling systems. In this article we are going to explore how to implement a loosely coupled pub-sub architecture in Azure. Before we get into the technical stuff we need to visit the real-world distribution model that is the inspiration for this pattern. We will start by looking at an over-simplified example of how the pub-sub pattern works in the music industry. Then I will translate the real-world example into technical jargon. Next, I will put forward several arguments in favor of implementing the pub-sub pattern as loosely coupled components. Finally we'll close out by contemplating a possible implementation using Azure services.
+In this article we are going to explore one way to implement a loosely coupled pub-sub architecture in [Azure](https://azure.microsoft.com/en-us). The [publisher-subscriber pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) is all about decoupling systems, it originates from a real-world distribution model typically used to distribute physical media. We will start our journey by looking at a simplified example of how the pub-sub pattern works in the music industry. Then I will translate the real-world example into an abstract sequence diagram. Next, I will put forward several arguments in favor of implementing the pub-sub pattern as a sequence of loosely coupled components. Finally, we'll conclude by exploring an implementation using Azure services.
 
-## Physical media distribution
-TODO: left off here, need to write an introduction to the bullet list below. Then a translation to EDA terminology.
+This article is long and opinionated, if you are already bought in to the idea of loosely coupled pub-sub architectures I suggest you skip down to the technical stuff where I describe why I selected each Azure service.
 
-* A musician produces a musical album in a recording studio.
-* A record label manufactures and publishes the album.
-* A distributor ships the album through it's distribution channels to retailers.
-* Retailers have direct relationships with distributor to obtain the album.
-* Consumers purchase the album from retailers.
+## Pub-sub in the real world
+The production, publication, distribution, wholesale, and consumption of a music album can be summarized as follows:
 
-The pattern works in the real world because regular folks like you and do not need to know how the album got the store. Our area of concern is simple. We care that our favorite artist recorded a fantastic album, in other words, we care about the art, and we care that it is conveniently available for purchase. 
+1. Your favorite musician produces a musical album in a recording studio.
+1. The record label manufactures and publishes the album.
+1. A distributor ships the album through it's distribution network to retailers.
+1. Retailers purchase the album at wholesale from the distributor.
+1. Consumers purchase the album from retailers.
+
+From the perspective of the artist the only thing that they control is the production of the original recording. In an abstract way the artist understands a copy of their album will find its way to consumers but who exactly buys the album and what route the album took to get to their fans is outside the artist's purview.
+
+From the perspective of the consumer every step between the album being recorded (a.k.a. produced) and the album landing in the consumer's hands is a boring technical detail. The artist (ie: the producer) and the fans (ie: consumers) are the key players in the system. The record label, the distributor, and the music store are fungible components of the system.
+
+If the record label, the distributor, and the music store are as trivial as I am suggesting why do they exists. Why doesn't the artist press their own records, drive the delivery truck, drop off the album at their fan's mailbox? The answer is because that is a lot of work the artist rather not be doing. I want to put a fine point on this because it bolsters my argument. Do you think the artists wants to deal with payment processing, charge backs, the lease and insurance on a retail space, delivery truck maintenance... the list goes on.
+
+TODO: left off here, need to transition to the abstract model. Need a paragraph to describe the following 
+artist = producer
+record label = publisher
+distributor = message bus
+music store = subscriber
+fan = consumer
 
 
 Let's start with some definitions to make sure we have a shared understanding of the terms. In particular I am going to make a firm distinction between the terms producer and publisher as well as subscribers and consumers. These terms are often used interchangeably in high level system designs. But once we get into implementation details the distinction becomes necessary.
@@ -45,7 +58,7 @@ A loosely coupled pub-sub architecture does not inherently provide high availabi
 ## Subscribers & Consumers
 A subscriber is a component from the infrastructure layer responsible for marshaling events from the message bus to the consumer of the event. Its purpose is to abstract the message publishing infrastructure from the consumer. You can think of the subscriber a mirrored counterpart of the publisher. Just like the publisher, the subscriber is a commodity, a technical detail and it also should not encompass any business logic. Its implementation is dictated by the infrastructure.
 
-    In some architectural literature you may find publishers and subscribers collectively referred to as message relays. I would urge you to you stick with the terms publisher and subscribers if for no other reason than these terms invoke a mental model that is more contextual and descriptive.
+    In some architectural literature you may find publishers and subscribers collectively referred to as message relays. I would urge you to use the terms publisher and subscribers if for no other reason than these terms invoke a mental model that is more contextual. In other words the terms publisher and subscriber immediately let you know which side of the message bus you are dealing with.
 
 A consumer is a business construct responsible for reacting to a domain event. Consuming events is a business concern and so the behavior of the consumer is dictated by business rules. In the way that the subscriber is the mirrored counterpart of the publisher so is the consumer the mirror counterpart of the producer.
 
@@ -140,3 +153,6 @@ For systems that demand the highest level of availability each component can be 
 
 
 Working with legacy and heterogenous technology is a staple of the technologist's skill set
+
+
+Regular folks like you and I do not need to know how the album arrived at the music store. The only thing that matters from the consumers perspective is that our favorite artist produced a great album and that there is a convenient way to purchase the album
