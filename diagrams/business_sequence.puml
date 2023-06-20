@@ -4,7 +4,7 @@ skinparam ParticipantFontColor #White
 title Order Created Event - Functional Sequence Diagram
 participant ClientApp as "<b>Client App" #SlateGray
 participant Producer as "<b>Producer\n<i><<Order Service>>" #RoyalBlue
-participant EventStore as "<b>Event Store\n<i><<Produer Outbox>>" #DarkCyan
+participant EventStore as "<b>Event Store\n<i><<Producer Outbox>>" #DarkCyan
 participant Publisher as "<b>Publisher" #DarkSlateBlue
 participant MessageBus as "<b>Message Bus" #Darkorange
 participant Subscriber as "<b>Subscriber" #DarkSlateBlue
@@ -13,10 +13,10 @@ participant BillingService as "<b>Consumer\n<i><<Billing Service>>" #RoyalBlue
 
 autonumber
 activate ClientApp #Lime
-ClientApp -> Producer : Submit <b>create_order</b> command
+ClientApp -> Producer : Submit <b>create_order</b>\ncommand
 
 activate Producer #Lime
-Producer -> EventStore : Append <b>order_created</b> event
+Producer -> EventStore : Append <b>order_created</b>\nevent
 
 activate EventStore #Lime
 EventStore --> Producer : Return success
@@ -31,20 +31,26 @@ EventStore <- Publisher : Read database log\n(<i>Change Data Capture</i>)
 activate EventStore #Lime
 
 activate Publisher #Lime
-Publisher -> MessageBus : Publish <b>order_created</b> event
+Publisher -> MessageBus : Publish <b>order_created</b>\nevent
+
+
+
+
+
+
 
 activate MessageBus #Lime
 MessageBus --> Publisher : Return success
 deactivate MessageBus
 
-Publisher -> EventStore : CDC check-point
+Publisher -> EventStore : Set CDC check-point
 deactivate Publisher
 deactivate EventStore
 
-MessageBus <- Subscriber : Read event
+MessageBus <- Subscriber : Read <b>order_created</b>\nevent
 activate MessageBus #Lime
 activate Subscriber #Lime
-Subscriber -> BillingInbox : Push event
+Subscriber -> BillingInbox : Write <b>order_created</b>\nevent
 activate BillingInbox #Lime
 
 BillingInbox -> Subscriber : Return success
@@ -53,12 +59,12 @@ Subscriber -> MessageBus: Return success
 deactivate Subscriber
 deactivate MessageBus
 
-BillingInbox <- BillingService : Read event
+BillingInbox <- BillingService : Read <b>order_created</b>\nevent
 activate BillingInbox #Lime
 activate BillingService #Lime
 BillingService --> BillingService: Consume event
 BillingService -> BillingInbox: Mark event\nas consumed
 deactivate BillingService
 deactivate BillingInbox
-footer The break in the lifelines is there to denote that the entire sequence is made up multiple independent sub-sequences.\nEach sub-sequence is simple, easy to manage and independently scalable
+footer The breaks in the lifelines are there to denote that the entire sequence is made up multiple independent transactions.\nEach transaction is simple, easy to manage and independently scalable.
 @enduml
