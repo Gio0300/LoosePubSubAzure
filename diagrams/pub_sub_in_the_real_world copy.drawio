@@ -1,0 +1,103 @@
+<mxfile host="65bd71144e">
+    <diagram id="CQzcDcZlTINeK-SJ2JHd" name="Page-1">
+        <mxGraphModel dx="1236" dy="2288" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="800" pageHeight="320" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="68" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="3" target="63">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Record Label" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="274" y="140" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="70" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="4" target="49">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="71" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="4" target="49">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="" style="html=1;strokeColor=#2B2B2B;entryX=-0.015;entryY=0.891;entryDx=0;entryDy=0;exitX=1;exitY=0;exitDx=0;exitDy=0;entryPerimeter=0;" edge="1" parent="1" source="4" target="24">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="4" target="48">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Distributor" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="499" y="140" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="67" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="22" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Music" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="159" y="140" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="66" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="23" target="22">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="Artist" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="41" y="140.5" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Music Retail Store" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="611" y="72" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="Music Retail Store" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="611" y="140" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="Music Retail Store" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="611" y="208" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="789" y="215" width="87" height="81" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="53">
+                    <mxGeometry x="7" y="21" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="53">
+                    <mxGeometry x="4" y="11" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="53">
+                    <mxGeometry width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="787" y="130" width="87" height="81" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="54">
+                    <mxGeometry x="7" y="21" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="54">
+                    <mxGeometry x="4" y="11" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="54">
+                    <mxGeometry width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="785" y="44" width="87" height="81" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="58">
+                    <mxGeometry x="7" y="21" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="58">
+                    <mxGeometry x="4" y="11" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="61" value="Music Fan" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontStyle=1" vertex="1" parent="58">
+                    <mxGeometry width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="Retail Album" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="700" y="140.5" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="" style="edgeStyle=none;html=1;strokeColor=#2B2B2B;" edge="1" parent="1" source="63" target="4">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="63" value="Wholesale Albums" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="390" y="140.5" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="64" value="Retail Album" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="698" y="56" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" value="Retail Album" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="700" y="222" width="80" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

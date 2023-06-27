@@ -1,5 +1,7 @@
 # Loosely coupled pub-sub on Azure
 
+Describe the diagram under "From real-world to abstract"
+
 pitfalls avoid
 Mixing the subscriber code with other functionality. Can't scale one without the other.
 
@@ -8,42 +10,45 @@ Outro
 Insert diagrams
 
 
-In this article we are going to explore one way to implement a loosely coupled pub-sub architecture in [Azure](https://azure.microsoft.com/en-us). The [publisher-subscriber pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) is all about decoupling systems, it originates from a real-world distribution model commonly used to distribute physical media. We will start our journey by looking at a simple example of how the pub-sub pattern works in the music industry. Then I will translate the real-world example into an abstract sequence diagram. Next, I will put forward several arguments in favor of implementing the pub-sub pattern as a sequence of loosely coupled components. Finally, we'll conclude by exploring a loosely coupled and highly scalable implementation using Azure services.
+The [publisher-subscriber pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/publisher-subscriber) is all about decoupling systems, it originates from a real-world distribution model commonly used to distribute physical media. In this article we are going to explore one way to implement a loosely coupled pub-sub architecture in [Azure](https://azure.microsoft.com/en-us).  We will start our journey by looking at a simple example of how the pub-sub pattern works in the music industry. Then I will translate the real-world example into an abstract sequence diagram. Next, I will put forward several arguments in favor of implementing the pub-sub pattern as a sequence of loosely coupled components. Finally, we'll conclude by exploring a loosely coupled and highly scalable implementation using Azure services.
 
 This article is long and opinionated, if you are already bought in to the idea of loosely coupled pub-sub architectures I suggest you skip down to the technical stuff where I describe why I selected each Azure service.
 
 ## Pub-sub in the real world
+
 The production, publication, distribution, wholesale, and consumption of a music album can be summarized as follows:
 
 1. Your favorite artist produces a musical album in a recording studio.
-1. The record label manufactures and publishes the album.
-1. A distributor ships the album through it's distribution network to retailers.
-1. Retailers purchase the album at wholesale from the distributor.
-1. Consumers purchase the album from retailers.
+2. The record label manufactures and publishes the album.
+3. A distributor ships the album through it's distribution network to retailers.
+4. Retailers purchase the album at wholesale from the distributor.
+5. Music fan purchase the album from retailers.
 
-Diving into this model we find the artist is the catalyst, it all starts at the recording studio. Notice however that the only thing the artists controls is the production of the original recording. The artists delegates the manufacture, distribution and sale of the album. They have an abstract notion that a copy of their album will find its way to fans but all the intervening steps fall outside the artist's purview.
+Let's examine the role played by each participant in our over simplified music distribution model. The artist is arguably the most important part of this model, they are the catalyst to the whole process. Regardless of how important they may be their active involvement ends shorty after the production of the album. They delegate the manufacture, distribution and sale of the album to other actors of the system. The artist maintains a vested interest in album sales, however they only have an abstract notion of how a copy of the album will find its way to fans. All the intervening steps between production and sale fall outside the artist's purview.
 
-From the perspective of the fans it's the same story as the artist but in reverse. The manufacture, distribution, and wholesale are nothing but technical details. The artist (ie: the producer) and the fans (ie: consumers) are the key players in this model. One cannot easily swap the artist or the fans without a major shake up. 
+Next we will skip a few steps and move our focus to the fans. Here we find a similar story to the artist in terms of the intervening steps between producing and purchasing the album. The music fan only cares about the enjoying the music. The manufacture, distribution, and wholesale are nothing but technical details to the fans. 
 
-The record label, the distributor, and the music store are fungible components of the system. And although these components are less difficult to replace that does not mean they are trivial. Quite the opposite. They bring value and specialized expertise. They bring economies of scale and efficiency, business relationships, industry clout, and physical infrastructure. Consider this, why doesn't the artist press their own records, drive the delivery truck, drop off the album at their fan's mailbox? Because that is a lot of work the artist rather not be doing. I want to put a fine point on the importance of the middle components because it is a crucial aspect to understanding loosely coupled pub-sub architectures. Do you think the artists wants to deal with payment processing, charge backs, the insurance on a retail space, delivery truck maintenance? Of course not. Artist need to be busy making music, everything else can be handled by those better suited for those jobs. Keep this list of assiduous tasks and responsibilities in mind because we'll revisit them in a bit.
+The record label, the distributor, and the retail store could be considered less critical. One could replace any and all of these actors with an equivalent actor and neither the artist nor the fan would notice. However, consider this, why doesn't the artist press their own records, drive the delivery truck, drop off the album at their fan's mailbox and cut out the middle layer? Because that is a lot of work the artist rather not be doing. The record label, the distributor, and the retail store bring value and specialized skills. They bring economies of scale and efficiency, business relationships, industry clout, and physical infrastructure. I want to put a fine point on the importance of the middle layer components because it is a crucial aspect to understanding loosely coupled pub-sub architectures. Do you think the artists wants to deal with payment processing, charge backs, the insurance on a retail space, delivery truck maintenance? Of course not. Artist need to be busy making music, everything else can be handled by those better suited for those jobs. Keep this list of assiduous tasks and responsibilities in mind because we'll revisit them in a bit.
 
-We've taken the music record analogy as far as it can go. Now we will switch to the world of software architecture. We can roughly equate the real world actors to their corresponding abstract components in a pub-sub architecture. The artist in the real world equates to the producer, the record label to the publisher, the distributor to a message bus, the music store to a subscriber and a music fan to a consumer. To ease the transition we will start with some definitions to ensure we have a shared understand of technical terms. In particular I am going to make a firm distinction between the terms producer and publisher as well as subscribers and consumers. These terms are often used interchangeably in high level system designs. But once we get into implementation details the distinction becomes necessary.
+We've taken the music record analogy as far as it can go. Now we will switch to the world of software architecture. We can roughly equate the real world actors to their corresponding abstract components in a pub-sub architecture. The artist in the real world equates to the producer, the record label to the publisher, the distributor to a message bus, the music store to a subscriber and a music fan to a consumer. To ease the transition we will start with some definitions to ensure we have a shared understanding of technical terms. In particular I am going to make a firm distinction between the terms producer and publisher as well as subscribers and consumers. These terms are often used interchangeably in high level system designs but once we get into implementation details the distinction becomes necessary.
 
 ## Producers & Publishers
 A producer is a business construct responsible for creating domain events based on business rules. Producing events is strictly a business concern, the producer is divorced from all infrastructure related responsibility. Much like the business logic isn't responsible for data persistance which is typically delegated to a database. Producers are not responsible for publishing events, publishing is an infrastructure concern.
 
-A publisher is component from the infrastructure layer responsible for marshaling events from the event store to the message bus. The publisher sets the terms of the integration with subscribers. It owns the message bus and its operational policies. The publisher is a commodity, a technical detail, the publisher should not encompass any business knowledge. The implementation of the publisher is dictated by the operating infrastructure.
+A publisher is component from the infrastructure layer responsible for marshaling events from the event store to the message bus. The publisher sets the terms of the integration with subscribers. It owns the message bus and its operational policies. The publisher is a commodity, a technical detail, the publisher should not encompass any business knowledge. The implementation of the publisher is dictated by the operational environment.
 
-### Reasons to separate producers and publishers
+### A deeper dive: reasons to separate producers and publishers
 #### Separation of concern
-Publishing events is a complex endeavour. Publishers must deal with the idiosyncrasies of the message bus, integration policies, geo-replication, retries, replays, queue & log semantics, partitions, sessions, ordering, deduplication, etc. Recall all those assiduous task that the artist does not want to mess with. The same principal of separation of concern applies to the producer. Producers should not be burdened with such technical details. The producer must focus on business domain.
-#### Reduce distributed transactions
-Separating the roles eliminates the need for a distributed transaction where the producer must write the event to the event store and the message bus simultaneously to maintain concurrency. The producer need only to emit the domain event, the application and infrastructure layers will marshal the event to the event store in a single transaction.
+Publishing events is a complex endeavour. Publishers must deal with the idiosyncrasies of the message bus, geo-replication, retries, replays, queue & log semantics, partitions, sessions, ordering, deduplication, network partitions, etc. Recall all those assiduous task that the artist does not want to mess with. The same principal of separation of concern applies to the producer. Producers should not be burdened with the technical details of publishing an event. The producer must focus on the production of domain events and nothing else.
+#### Eliminate distributed transactions
+Without separating the roles of producer and publisher into distinct components the producer must utilize a distributed transaction wherein it must write the event to the event store and publish the event to the message bus simultaneously to maintain consistency. Distributed transaction simply don't work in cloud environments.
 
-The publisher will eventually read and publish the event in a separate transaction. With this arrangement the producer is free to operate even when there is an outage on the message bus.
+By separating the roles the producer need only to emit the domain event, the application and infrastructure layers will marshal the event to the event store in a single transaction. The publisher will eventually read and publish the event in a separate transaction. With this arrangement the producer is free to operate even when there is an outage on the message bus that would otherwise make a distributed transaction impossible.
 
 #### Independent scaling
-The scaling profile of the producer may be widely different than that of the publisher. Consider an application where the producer is a real-time service that accepts customer orders. The producer will need to be scaled in direct relation to customer demand, maybe this demand is seasonal, maybe it's unpredictable. Once an order is placed successfully the rest of the order workflow may operate at a fixed rate. In this example the publisher may be scaled to provide a fixed throughput that provides load leveling for the rest of the system. Now consider a scenario were a large number of events need to be republished. Perhaps the business wants to try new analytics workflow or to hydrate the message bus after recovering from a disaster. In such cases the publisher may be scaled out/up temporarily to provide increased throughput without affecting the producer.
+The scaling profile of the producer may be significantly different than that of the publisher. Consider an application where the producer is a real-time service that accepts customer orders. The producer will need to be scaled in direct relation to customer demand. Accepting the order is critical, however, after an order is accepted the rest of the order fulfillment process may operate at a fixed rate. In this example the publisher may be scaled and configured to provide a fixed throughput. The fixed throughput in turn provides load leveling for the rest of the fulfillment process.
+
+Now consider a scenario were a large number of events need to be republished because the business wants to try new streaming analytics workflow or we need to hydrate the message bus after recovering from a disaster. In such cases the publisher may be scaled out/up temporarily to provide increased throughput without affecting the producer.
 
 #### Independent deployment
 As the business evolves so must the producer. The producer will need to be update regularly, specially in the early days of development. On the other hand the publisher is a commodity. The publisher should be blissfully ignorant of business logic and thus should have very little reason to change. Separating the roles allows the producer to be updated and deployed independently from the the publisher.
@@ -54,12 +59,16 @@ A loosely coupled pub-sub architecture does not inherently provide high availabi
 ## Subscribers & Consumers
 A subscriber is a component from the infrastructure layer responsible for marshaling events from the message bus to the consumer of the event. Its purpose is to abstract the message publishing infrastructure from the consumer. You can think of the subscriber as the mirrored counterpart of the publisher. Just like the publisher, the subscriber is a commodity, a technical detail and it also should not encompass any business logic. Its implementation is dictated by the infrastructure.
 
-    In some architectural literature you may find publishers and subscribers collectively referred to as message relays. I would urge you to use the terms publisher and subscribers if for no other reason than these terms invoke a mental model that is more contextual. In other words the terms publisher and subscriber immediately let you know which side of the message bus you are dealing with.
+    In some architectural literature you may find publishers and subscribers collectively referred to as message relays. I would urge you to use the terms publisher and subscribers if for no other reason than these terms invoke a mental model that is more contextual. In other words the terms publisher and subscriber immediately let you know which side of the pub-sub architecture you are working with.
 
 A consumer is a business construct responsible for reacting to a domain event. Consuming events is a business concern and so the behavior of the consumer is dictated by business rules. In the same way that the subscriber is the mirrored counterpart of the publisher so is the consumer the mirror counterpart of the producer.
 
 ### Reason to separate subscribers and consumers
-In the interest of brevity I will summarize the reasons to separate subscribers and consumers as roughly the same reasons given for separating the producers and publishers. There are some differences of course but the principals are the same.
+In the interest of brevity I will summarize the reasons to separate subscribers and consumers as roughly the same reasons given for separating the producers and publishers. There are some differences of course but the principals are largely the same.
+
+#From real-world to abstract
+
+![Functional Sequence Diagram](images/functional_sequence_diagram.png)
 
 ## From abstract to concrete
 Now it's time to move into an implementation plan. I will break down each component from the functional sequence diagram. Considering the subject of this article is loosely coupled pub-sub I will skim over the intricacies of many of the components to focus on pub-sub constructs. It goes without saying that the implementation I am presenting is simply an illustrative example, one of many possible solutions and your solution will likely vary.
@@ -153,3 +162,5 @@ Working with legacy and heterogenous technology is a staple of the technologist'
 Regular folks like you and I do not need to know how the album arrived at the music store. The only thing that matters from the consumers perspective is that our favorite artist produced a great album and that there is a convenient way to purchase the album
 
 The pub-sub pattern in software development is directly based on the real world pub-sub pattern of the media industry. I like to use the analogy of a music record producer and a publishing house when I think about the pub-sub pattern in my software designs. In the music industry the producer is concern with making a good record that the audience (consumers) will like. The producer is not concern with record stampings, packing, shipping, marketing, etc... that's the publishers job. I think of events as making the music, the art, the unique atom of work that delivers value. I think of publishing as the labor of moving physical objects from point A to point B. As a record label (ie: the business) I want my producer cranking out as many hits as possible. Publishing is nothing more than a commodity farmed out to the lowest bidder.
+
+The artist (ie: the producer) and the fans (ie: consumers) are the key players in this model. One cannot easily swap the artist or the fans without a major shake up. 
