@@ -5,9 +5,9 @@ header "Entity First Pub/Sub"
 title Entity First Pub-Sub Conceptual Sequence on Azure
 participant ClientApp as "<b>Client App\n" #SlateGray
 participant OrderService as "<b>Legacy Order\n<b>Service" #RoyalBlue
-participant DataStore as "<b>Data Store\n<i><<Relational DB>>" #DarkCyan
-participant Publisher as "<b>Publisher\n<i><<WebJob>>" #DarkSlateBlue
-participant EventHubs as "<b>Message Broker\n<i><<Event Hubs>>" #Darkorange
+participant DataStore as "<b>Data Store\n<i><<Relational database>>" #DarkCyan
+participant Publisher as "<b>Publisher\n" #DarkSlateBlue
+participant EventHubs as "<b>Message Broker\n" #Darkorange
 
 autonumber
 activate ClientApp #Lime
